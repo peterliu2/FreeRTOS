@@ -1,0 +1,32 @@
+# Object files
+*.o
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+
+# Executables
+*.bin
+
+# map files
+*.map
+
+# Debug files
+*.d
+*.axf
+
+# vim temp files
+*.swp
+
+# cscope files
+cscope*
+
+# taglist files
+tags
+
+# git file
+*.orig
