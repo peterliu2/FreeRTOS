@@ -1,3 +1,11 @@
+Peter Note:
+1. Only for "FreeRTOS/FreeRTOSV9.0.0rc1/FreeRTOS/Demo/CORTEX_TM4C123GH6PGE_GCC"
+  + Add debug cgdb and nemiver debug functions.
+    cd FreeRTOS/Demo/CORTEX_TM4C123GH6PGE_GCC/
+    make debug_nemiver DEBUG=1 or make debug_cgdb DEBUG=1
+
+
+
 Directories:
 
 + FreeRTOS/source contains the FreeRTOS real time kernel source code.
