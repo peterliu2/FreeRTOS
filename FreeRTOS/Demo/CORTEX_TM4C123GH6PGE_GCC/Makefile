@@ -52,7 +52,8 @@ VPATH=${RTOS_SOURCE_DIR}:						\
 	  ${RTOS_SOURCE_DIR}/portable/GCC/ARM_CM4F:	\
 	  ${DEMO_SOURCE_DIR}:						\
 	  ${ROOT}/drivers:							\
-	  ${ROOT}/init								\
+	  ${ROOT}/init:								\
+	  ${ROOT}/utils								\
 
 #
 # Where to find header files that do not live in the source directory.
@@ -70,16 +71,22 @@ OBJS= ${COMPILER}/main.o	\
       ${COMPILER}/queue.o   \
       ${COMPILER}/tasks.o   \
       ${COMPILER}/port.o    \
-      ${COMPILER}/heap_1.o  \
+      ${COMPILER}/heap_3.o  \
 	  ${COMPILER}/BlockQ.o	\
 	  ${COMPILER}/PollQ.o	\
 	  ${COMPILER}/integer.o	\
 	  ${COMPILER}/semtest.o \
-	  ${COMPILER}/cfal96x64x16.o
+	  ${COMPILER}/cfal96x64x16.o\
+	  ${COMPILER}/syscalls.o\
+	  ${COMPILER}/uartstdio.o\
+	  ${COMPILER}/cmdline.o\
+	  ${COMPILER}/commands.o\
+	  ${COMPILER}/cpu_usage.o
+
 
 INIT_OBJS=${COMPILER}/startup.o
 
-LIBS=${ROOT}/driverlib/${COMPILER}/libdriver.a   ${ROOT}/grlib/${COMPILER}/libgr.a
+LIBS=${ROOT}/driverlib/${COMPILER}/libdriver.a ${ROOT}/grlib/${COMPILER}/libgr.a
 
 #
 # The default rule, which causes init to be built.
@@ -103,14 +110,17 @@ ${COMPILER}:
 ${COMPILER}/RTOSDemo.axf: ${INIT_OBJS} ${OBJS} ${LIBS} 
 
 SCATTER_RTOSDemo=standalone.ld
-ENTRY_RTOSDemo=ResetISR
-CFLAGSgcc=-DTARGET_IS_BLIZZARD_RB1 
+ENTRY_RTOSDemo=Reset_Handler
+CFLAGSgcc=-DTARGET_IS_TM4C123_RA1 
 
 #
 # Include the automatically generated dependency files.
 #
 -include ${wildcard ${COMPILER}/*.d} __dummy__
 
+#
+# Peter define.
+#
 DIRS = driverlib grlib ${ROOT}
 
 
@@ -132,28 +142,30 @@ clean_all:
 	     fi;                       \
 	 done
 
-clean_bulid: clean_all
-clean_bulid: build_all
+clean_build: clean_all
+clean_build: build_all
 
-clean_bulid_flash: clean_bulid
+clean_build_flash: clean_build
+	@echo  "\033[1m flash '${COMPILER}/RTOSDemo.bin' into uC \033[0m"
+	@lm4flash  ${COMPILER}/RTOSDemo.bin
+
+build_flash: build_all
 	@echo  "\033[1m flash '${COMPILER}/RTOSDemo.bin' into uC \033[0m"
 	@lm4flash  ${COMPILER}/RTOSDemo.bin
 
 #
 # The rule to rebuild the project and debug it with Nemiver.
 #
- 
- debug_nemiver debug_cgdb: clean_bulid
+debug_nemiver debug_cgdb: build_all
+debug_nemiver_clean_build debug_cgdb_clean_build: clean_build
 
 
-debug_nemiver:
+debug_nemiver debug_nemiver_clean_build:
 	${ROOT}/debug_nemiver.sh ${shell pwd}/${COMPILER}/RTOSDemo.axf ek-tm4c123gxl.cfg
 
 #
 # The rule to rebuild the project and debug it with cgdb.
 #
-debug_cgdb:
+debug_cgdb debug_cgdb_clean_build:
 	${ROOT}/debug_cgdb.sh ${shell pwd}/${COMPILER}/RTOSDemo.axf ek-tm4c123gxl.cfg
-
-
 

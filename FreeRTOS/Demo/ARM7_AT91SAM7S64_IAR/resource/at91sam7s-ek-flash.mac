@@ -26,7 +26,8 @@
 *   This makes sense since the default is to not allow user resets, which makes it impossible to
 *   apply a second RESET via J-Link
 */
-_InitRSTC() {
+_InitRSTC()
+{
     __writeMemory32(0xA5000001, 0xFFFFFD08,"Memory");    // Allow user reset
 }
 
@@ -39,7 +40,8 @@ _InitRSTC() {
 *   2. Configure PLL to 96MHz
 *   3. Switch Master Clock (MCK) on PLL/2 = 48MHz
 */
-_InitPLL() {
+_InitPLL()
+{
 
     __message "Enable Main Oscillator";
     __writeMemory32(0x00000601,0xFFFFFc20,"Memory");    // MOSC
@@ -55,7 +57,7 @@ _InitPLL() {
     __writeMemory32(0x00000007,0xFFFFFc30,"Memory");    // MCKRDY
     while( !(__readMemory32(0xFFFFFc68,"Memory") & 0x8)  );
 
-    // Set 1 WS for Flash accesses on each EFC 
+    // Set 1 WS for Flash accesses on each EFC
     __writeMemory32(0x00480100,0xFFFFFF60,"Memory");
     __writeMemory32(0x00480100,0xFFFFFF70,"Memory");
 }
@@ -64,7 +66,8 @@ _InitPLL() {
 *
 *       execUserReset() : JTAG set initially to Full Speed
 */
-execUserReset() {
+execUserReset()
+{
     __message "execUserReset()";
     __hwReset(0);                       // Hardware Reset: CPU is automatically halted after the reset (JTAG is already configured to 32kHz)
     _InitPLL();                         // Allow to debug at JTAG Full Speed

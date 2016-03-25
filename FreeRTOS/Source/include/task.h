@@ -115,7 +115,7 @@ typedef enum {
     eBlocked,		/* The task being queried is in the Blocked state. */
     eSuspended,		/* The task being queried is in the Suspended state, or is in the Blocked state with an infinite time out. */
     eDeleted,		/* The task being queried has been deleted, but its TCB has not yet been freed. */
-    eInvalid			/* Used as an 'invalid state' value. */
+    eInvalid		/* Used as an 'invalid state' value. */
 } eTaskState;
 
 /* Actions that can be performed when vTaskNotify() is called. */

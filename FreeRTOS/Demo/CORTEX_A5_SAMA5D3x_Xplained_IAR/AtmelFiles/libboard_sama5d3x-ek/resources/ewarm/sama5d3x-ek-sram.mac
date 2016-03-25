@@ -10,7 +10,7 @@
 // ---------------------------------------------------------
 //  File: sama5d3x-ek-sram.mac
 //  User setup file for CSPY debugger.
-//  
+//
 // ---------------------------------------------------------
 
 __var __tempo_var;
@@ -38,14 +38,15 @@ execUserPreload()
 {
     __message "------------------------------ execUserPreload ---------------------------------";
     //__hwReset(0);                     //* Hardware Reset: CPU is automatically halted after the reset (JTAG is already configured to 32kHz)
-    
+
     __writeMemory32(0xD3,0x98,"Register"); //*  Set CPSR
     //CheckNoRemap();                   //* Set the RAM memory at 0x0020 0000 & 0x0000 0000
     Watchdog();                       //* Watchdog Disable
 
     //*  Get the Chip ID  (AT91C_DBGU_C1R & AT91C_DBGU_C2R
     __mac_i=__readMemory32(0xFFFFEE40,"Memory");
-    __message " ---------------------------------------- Chip ID   0x",__mac_i:%X;
+__message " ---------------------------------------- Chip ID   0x",__mac_i:
+    %X;
 }
 
 
@@ -60,35 +61,29 @@ execUserPreload()
 CheckNoRemap()
 {
     __tempo_var = __readMemory32(0x00000000,"Memory");
-    
-    if (__tempo_var == 0xAA55AA55) 
-    {
-       __data_test = 0x55AA55AA;
+
+    if (__tempo_var == 0xAA55AA55) {
+        __data_test = 0x55AA55AA;
+    } else {
+        __data_test = 0xAA55AA55;
     }
-    else
-      {
-         __data_test = 0xAA55AA55;
-      }
-      
+
     __writeMemory32(__data_test,0x00000000,"Memory");
-      
+
     __dummy_read = __readMemory32(0x00000000,"Memory");
 
     __writeMemory32(__tempo_var,0x00000000,"Memory");
-   
-    if (__dummy_read == __data_test) 
-    {
-       __message " ------------------------ The Remap is already done ------------------------";
+
+    if (__dummy_read == __data_test) {
+        __message " ------------------------ The Remap is already done ------------------------";
+    } else {
+        __message " ------------------------ The Remap is not DONE ------------------------";
+        __writeMemory32(0x00000001,0xFFFFED00,"Memory");
+        __delay(2);
+        __writeMemory32(0x00000001,0x00800000,"Memory");
+        __delay(50);
+        __message "------------ The Remap was executed ------------";
     }
-    else
-      {
-         __message " ------------------------ The Remap is not DONE ------------------------";
-         __writeMemory32(0x00000001,0xFFFFED00,"Memory");
-         __delay(2);
-         __writeMemory32(0x00000001,0x00800000,"Memory");
-         __delay(50);
-         __message "------------ The Remap was executed ------------";
-      }
 }
 
 /*********************************************************************
@@ -101,8 +96,8 @@ CheckNoRemap()
 
 Watchdog()
 {
-   // Watchdog Disable
-   __writeMemory32(0x00008000,0xFFFFFE44,"Memory");
-   __message " ------------------------ Watchdog Disable ------------------------";
+    // Watchdog Disable
+    __writeMemory32(0x00008000,0xFFFFFE44,"Memory");
+    __message " ------------------------ Watchdog Disable ------------------------";
 }
 

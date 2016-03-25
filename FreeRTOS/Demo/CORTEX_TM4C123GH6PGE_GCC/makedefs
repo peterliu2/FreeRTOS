@@ -66,30 +66,30 @@ CC=arm-none-eabi-gcc
 # Set the complier CPU/FPU options.
 #
 CPU=-mcpu=cortex-m4
-FPU=-mfpu=fpv4-sp-d16 -mfloat-abi=softfp
+FPU=-mfpu=fpv4-sp-d16 -mfloat-abi=hard
 
 #
 # The flags passed to the assembler.
 #
-AFLAGS=-mthumb			\
-       ${CPU}			\
-	   ${FPU}			\
-       -MD
+AFLAGS=	-mthumb					\
+		${CPU}					\
+		${FPU}					\
+		-MD
 
 #
 # The flags passed to the compiler.
 #
-CFLAGS=-mthumb				\
-       ${CPU}				\
-	   ${FPU}				\
-	   -ffunction-sections	\
-	   -fdata-sections		\
-	   -std=c99				\
-	   -Wall				\
-	   -pedantic			\
-	   -DPART_${PART}		\
-       -MD					\
-	   -c
+CFLAGS=	-mthumb					\
+		${CPU}					\
+		${FPU}					\
+		-ffunction-sections		\
+		-fdata-sections			\
+		-std=c99				\
+		-Wall					\
+		-pedantic				\
+		-DPART_${PART}			\
+		-MD						\
+		-c
 
 #
 # The command for calling the library archiver.
@@ -104,7 +104,7 @@ LD=arm-none-eabi-ld
 #
 # The flags passed to the linker.
 #
-LDFLAGS= --gc-sections  -Map ${COMPILER}/out.map 
+LDFLAGS= --gc-sections -Map ${COMPILER}/out.map 
 
 #
 # Get the location of libgcc.a from the GCC front-end.
@@ -114,7 +114,7 @@ LIBGCC=${shell ${CC} ${CFLAGS} -print-libgcc-file-name}
 #
 # Get the location of libc.a from the GCC front-end.
 #
-LIBC=${shell ${CC} ${CFLAGS} -print-file-name=libc.a}
+LIBC=${shell ${CC} ${CFLAGS} -print-file-name=libg.a}
 
 #
 # Get the location of libm.a from the GCC front-end.
@@ -135,7 +135,7 @@ endif
 #
 #******************************************************************************
 ifdef DEBUG
-CFLAGS += -g -D DEBUG -O0
+CFLAGS += -g -gdwarf-3 -gstrict-dwarf -D DEBUG -O0
 else
 CFLAGS += -Os
 endif
@@ -224,13 +224,13 @@ ${COMPILER}/%.axf:
 	     echo "  LD    ${@}";  \
 	 fi
 ifeq (${COMPILER}, gcc)
-	@if [ 'x${VERBOSE}' != x ];                           \
-	 then                                                 \
-	     echo ${LD} -T ${SCATTER_${notdir ${@:.axf=}}}    \
-	                --entry ${ENTRY_${notdir ${@:.axf=}}} \
-	                ${LDFLAGSgcc_${notdir ${@:.axf=}}}    \
-	                ${LDFLAGS} -o ${@} ${^}               \
-	                '${LIBM}' '${LIBC}' '${LIBGCC}';				  \
+	@if [ 'x${VERBOSE}' != x ];								\
+	 then													\
+	     echo ${LD} -T ${SCATTER_${notdir ${@:.axf=}}}		\
+	                --entry ${ENTRY_${notdir ${@:.axf=}}}	\
+	                ${LDFLAGSgcc_${notdir ${@:.axf=}}}		\
+	                ${LDFLAGS} -o ${@} ${^}					\
+	                '${LIBM}' '${LIBC}' '${LIBGCC}';		\
 	 fi
 	@${LD} -T ${SCATTER_${notdir ${@:.axf=}}}    \
 	       --entry ${ENTRY_${notdir ${@:.axf=}}} \

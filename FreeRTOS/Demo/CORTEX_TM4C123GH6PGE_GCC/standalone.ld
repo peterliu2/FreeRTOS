@@ -26,6 +26,8 @@
  *
  *****************************************************************************/
 
+ENTRY(Reset_Handler)
+
 MEMORY
 {
     FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
@@ -36,13 +38,21 @@ SECTIONS
 {
     .text :
     {
-        KEEP(*(.isr_vector))
+        _text = .;
+	KEEP(*(.isr_vector))
         *(.text*)
         *(.rodata*)
-        _etext = .;
+		_etext = .;
     } > FLASH
+	
+	_exidx_start = .;
+	.ARM.exidx :
+	{
+		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
+	} > FLASH
+	__exidx_end = .;
 
-    .data : AT (ADDR(.text) + SIZEOF(.text))
+    .data : AT (__exidx_end)
     {
         _data = .;
         _ldata = LOADADDR (.data);
@@ -58,4 +68,8 @@ SECTIONS
         *(COMMON)
         _ebss = .;
     } > SRAM
+
+	. = ALIGN(4);
+	_heap_start = .;
+	_heap_limit = ORIGIN(SRAM) + LENGTH(SRAM);
 }
